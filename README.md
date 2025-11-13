@@ -1,48 +1,43 @@
-```markdown
 # 🚆 Train Ticket Booking Prediction — Deep Neural Network (NumPy From Scratch)
 
-This project implements a **5-layer deep neural network** (built completely from scratch using NumPy) to predict whether a **train ticket booking** will be **successful or not**, based on various features such as day of week, booking time, train popularity, season, travel class, and booking type.
+This project builds a **5-layer deep neural network** completely from scratch using **NumPy**, designed to predict whether a **train ticket booking** will be successful or not. The dataset involves several categorical and numerical fields, all of which are transformed manually before training the neural network.
 
-It demonstrates **manual deep learning implementation**, including feature preprocessing, multi-layer forward propagation, backpropagation, vectorized gradient descent, batching (partially implemented), and model evaluation — all **without using TensorFlow, Keras, or PyTorch**.
+The project demonstrates how deep learning works internally:
+✔ Manual feature preprocessing
+✔ Multi-layer forward propagation
+✔ Multi-layer backpropagation
+✔ Gradient descent optimization
+✔ Training loss monitoring
+✔ Manual binary classification inference
 
----
-
-## 📌 Project Highlights
-
-- 🔄 Converts all categorical features into numerical form using custom mapping  
-- 🤖 Implements a **5-layer feedforward neural network**  
-- 🧮 Uses **sigmoid activation** for all layers  
-- 🧠 Fully manual **forward + backward propagation**  
-- 🎯 Binary prediction output (0 or 1)  
-- 📉 Cost tracking over epochs  
-- 📊 Loss curve visualization using Seaborn  
-- 🧪 Final model accuracy computed on a separate test dataset  
+Everything is implemented **without TensorFlow, PyTorch, or Scikit-learn**.
 
 ---
 
-# 🧩 Dataset: `train_ticket_booking_dataset_50000.csv`
+# 📊 Dataset Overview
 
-The dataset contains 50,000+ booking records. Some of the key features:
+Dataset used:
+**\`train_ticket_booking_dataset_50000.csv\`**
+
+It contains **50,000+ rows** with the following features:
 
 | Feature | Description |
 |--------|-------------|
-| `Day_of_Week` | Day the booking was made |
-| `Time_of_Booking` | Morning / Afternoon / Evening / Night |
-| `Train_Popularity` | Low / Medium / High |
-| `Season` | Normal / Holiday / Festival |
-| `Travel_Class` | Sleeper / 3AC / 2AC / 1AC |
-| `Booking_Type` | Tatkal / Normal |
-| `Booking_Status` | Target (0 = Fail, 1 = Success) |
+| Day_of_Week | Day of booking |
+| Time_of_Booking | Morning / Afternoon / Evening / Night |
+| Train_Popularity | Low / Medium / High |
+| Season | Normal / Holiday / Festival |
+| Travel_Class | Sleeper / 3AC / 2AC / 1AC |
+| Booking_Type | Tatkal / Normal |
+| Booking_Status | Final output label (0 = Fail, 1 = Success) |
 
 ---
 
-## 🧮 Data Preprocessing
+# 🔄 Data Preprocessing (Manual Encoding)
 
-Categorical values are mapped numerically:
+All categorical values are mapped manually to integers:
 
-### **Day of Week**
-```
-
+### **Day\_of\_Week**
 Mon → 2
 Tue → 3
 Wed → 4
@@ -51,67 +46,44 @@ Fri → 6
 Sat → 7
 Sun → 1
 
-```
-
-### **Time of Booking**
-```
-
+### **Time\_of\_Booking**
 Morning → 1
 Afternoon → 2
 Evening → 3
 Night → 4
 
-```
-
-### **Train Popularity**
-```
-
+### **Train\_Popularity**
 Low → 1
 Medium → 2
 High → 3
 
-```
-
 ### **Season**
-```
-
 Normal → 1
 Holiday → 2
 Festival → 3
 
-```
-
-### **Travel Class**
-```
-
+### **Travel\_Class**
 Sleeper → 1
 3AC → 2
 2AC → 3
 1AC → 4
 
-```
-
-### **Booking Type**
-```
-
+### **Booking\_Type**
 Tatkal → 1
 Normal → 2
 
-```
-
-The dataset is then split into:
-
-- **Training set:** first 50,000 rows  
-- **Test set:** exported as `Test_dataset.csv`
+### **Splitting the Dataset**
+- First **50,000** rows → **Training set**
+- Remaining rows → **Test set**, saved as \`Test\_dataset.csv\`
 
 ---
 
 # 🧠 Neural Network Architecture
 
-This model uses **5 fully-connected (dense) layers**:
+The network contains **5 hidden layers**, implemented with plain NumPy:
 
-| Layer | Size | Activation |
-|-------|-------|------------|
+| Layer | Neurons | Activation |
+|-------|------------|-------------|
 | Input Layer | 13 features | — |
 | Hidden Layer 1 | 13 neurons | Sigmoid |
 | Hidden Layer 2 | 10 neurons | Sigmoid |
@@ -119,140 +91,167 @@ This model uses **5 fully-connected (dense) layers**:
 | Hidden Layer 4 | 3 neurons | Sigmoid |
 | Output Layer | 1 neuron | Sigmoid |
 
+The final output is binary:
+- \`0\` → Booking unsuccessful
+- \`1\` → Booking successful
+
 ---
 
-# 🔢 Forward Propagation Flow
+# 🧮 Activation Functions
 
-```
+## Sigmoid
+\[
+\sigma(z) = \frac{1}{1 + e^{-z}}
+\]
 
-X → W1 → A1 → W2 → A2 → W3 → A3 → W4 → A4 → W5 → A5 → Prediction
+## Sigmoid Derivative
+\[
+\sigma'(a) = a(1 - a)
+\]
 
-```
+---
 
-Where:
+# 🔢 Forward Propagation
 
-- `Z = W·X + b`
-- `A = sigmoid(Z)`
+Forward pass executes in this order:
+Input X
+↓
+Z1 = W1·X + b1
+A1 = sigmoid(Z1)
+↓
+Z2 = W2·A1 + b2
+A2 = sigmoid(Z2)
+↓
+Z3 = W3·A2 + b3
+A3 = sigmoid(Z3)
+↓
+Z4 = W4·A3 + b4
+A4 = sigmoid(Z4)
+↓
+Z5 = W5·A4 + b5
+A5 = sigmoid(Z5) ← Final output
 
 ---
 
 # 🔄 Backpropagation
 
-Gradients for all layers are manually computed:
+Error is propagated back through all 5 layers using:
 
-- `dW5, db5`
-- `dW4, db4`
-- `dW3, db3`
-- `dW2, db2`
-- `dW1, db1`
+- \`dZ5\`, \`dW5\`, \`db5\`
+- \`dZ4\`, \`dW4\`, \`db4\`
+- \`dZ3\`, \`dW3\`, \`db3\`
+- \`dZ2\`, \`dW2\`, \`db2\`
+- \`dZ1\`, \`dW1\`, \`db1\`
 
-Updating rule:
+### Gradient Descent Update:
+\[
+W := W - \alpha \cdot dW
+\]
+\[
+b := b - \alpha \cdot db
+\]
 
-```
-
-W -= learning_rate * dW
-b -= learning_rate * db
-
-````
+Where **α = learning rate**.
 
 ---
 
-# ⚙️ Training Setup
+# ⚙️ Training Configuration
 
-| Parameter | Value |
-|-----------|-------|
+| Hyperparameter | Value |
+|----------------|--------|
 | Epochs | 10,000 |
-| Batch Size | 64 (partial use) |
 | Learning Rate | 0.1 |
-| Loss Function | Binary Cross Entropy |
+| Batch Size | 64 |
+| Loss function | Binary Cross-Entropy |
 | Activation | Sigmoid (all layers) |
 
-Loss is printed every epoch and stored for graphing.
+Loss is recorded at each epoch and stored in \`cost\`.
 
 ---
 
-## 📉 Loss Curve
+# 📉 Loss Visualization
 
-Plotted using:
+Loss curve is plotted using:
 
-```python
+\`\`\`python
 sns.lineplot(cost)
-````
-
-This visualizes model convergence.
-
----
-
-# 🧪 Prediction Function
-
-The prediction pipeline:
-
-```python
-def predict(X):
-    Run forward propagation through all 5 layers
-    If output >= 0.5 → Predict 1
-    Else → Predict 0
-```
+\`\`\`
+This shows whether the model is converging properly.
 
 ---
 
-# 🎯 Model Accuracy
+# 🧪 Prediction Pipeline
 
-The final accuracy is computed over **all rows in the test set**:
+Once trained, each test sample is passed through all 5 layers.
+Binary classification rule:
 
-```python
-Accuracy : XX.XX%
-```
+If A5 >= 0.5 → Predict 1
+Else → Predict 0
 
-(Your output will vary depending on initialization and data.)
+This is done for all rows in the test dataset to compute accuracy.
+
+---
+
+# 🎯 Final Accuracy
+
+Accuracy is calculated using:
+
+$$
+\text{Accuracy} = \frac{\text{correct\_predictions}}{\text{total\_test\_samples}} \times 100
+$$
+
+You will see output like:
+
+\`\`\`
+Accuracy : 87.24%
+\`\`\`
+(Your accuracy may vary depending on initialization and randomness.)
 
 ---
 
 # 📦 Requirements
 
-Install dependencies:
+Install required libraries:
 
-```bash
+\`\`\`
 pip install numpy pandas seaborn
-```
+\`\`\`
 
 ---
 
-# ▶️ Running the Model
+# ▶️ How to Run
 
-Simply execute:
+To execute the complete training pipeline:
 
-```bash
+**Option 1 — Run as Python script**
+\`\`\`
 python train_model.py
-```
+\`\`\`
 
-Or run all cells in your Jupyter notebook / VSCode environment.
+**Option 2 — Run Jupyter Notebook / VSCode**
+Execute all cells in order.
 
 ---
 
-# 🧠 What You Learn From This Project
+# 📘 What You Will Learn
 
-* How to preprocess categorical data manually
-* How to build a deep neural network *from scratch*
-* How forward/backpropagation works internally
-* How to implement multi-layer gradient descent in NumPy
-* How to evaluate and visualize model performance
+By studying this project, you will understand:
+
+* How to **manually encode categorical ML dataset features**
+* How to build a **deep feedforward neural network from scratch**
+* How **forward propagation** works mathematically
+* How **backpropagation** works layer-by-layer
+* How to apply **gradient descent** without ML libraries
+* How to measure accuracy of a classifier
+* How to visualize loss curves
+* How real-world categorical data is transformed for machine learning
+
+This project is ideal for students learning **deep learning fundamentals**.
 
 ---
 
 # 👨‍💻 Author
 
 **Bharath**
-Machine Learning Engineer
-Exploring how deep learning works from first principles.
-
----
-
-If you want, I can also generate:
-
-✅ Architecture diagram
-✅ Project folder structure
-✅ Model explanation in mathematical format
-✅ Code optimization + refactoring
-
-Just tell me!
+Machine Learning Developer
+Focused on understanding and building ML systems from scratch to gain deep foundational knowledge.
